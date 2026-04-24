@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Odoo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">Odoo Insight</div>
+        <p class="muted">Panel de indicadores comerciales</p>
+        <nav class="side-nav">
+          <button class="side-btn active" data-tab="ventas">Ventas</button>
+          <button class="side-btn" data-tab="clientes">Clientes</button>
+          <button class="side-btn" data-tab="productos">Productos</button>
+          <button class="side-btn" data-tab="compras">Compras</button>
+          <button class="side-btn" data-tab="contabilidad">Contabilidad</button>
+          <button class="side-btn" data-tab="crm">CRM</button>
+        </nav>
+        <div class="side-foot">Actualizacion en vivo via Odoo API</div>
+      </aside>
+
+      <main class="content">
+        <header class="topbar">
+          <div>
+            <h1 id="page-title">Ventas</h1>
+            <p class="subtitle">Resumen de desempeno comercial</p>
+          </div>
+          <form id="filters" class="filters">
+            <label>
+              Desde
+              <input type="date" id="from" name="from" required />
+            </label>
+            <label>
+              Hasta
+              <input type="date" id="to" name="to" required />
+            </label>
+            <button type="submit">Actualizar</button>
+          </form>
+        </header>
+
+        <!-- TAB: VENTAS -->
+        <section id="tab-ventas" class="tab-pane active">
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <h3>Ventas Totales</h3>
+              <p id="v-kpi-sales">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Pedidos</h3>
+              <p id="v-kpi-orders">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Ticket Promedio</h3>
+              <p id="v-kpi-ticket">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Clientes Nuevos</h3>
+              <p id="v-kpi-customers">-</p>
+            </article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel wide">
+              <h3>Ventas por Mes</h3>
+              <canvas id="v-monthly-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Ventas por Categoria</h3>
+              <canvas id="v-category-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Top 5 Productos</h3>
+              <canvas id="v-products-chart"></canvas>
+            </article>
+            <article class="panel wide">
+              <h3>Ventas por Region</h3>
+              <canvas id="v-region-chart"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <!-- TAB: CLIENTES -->
+        <section id="tab-clientes" class="tab-pane">
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <h3>Clientes Activos</h3>
+              <p id="c-kpi-total">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Clientes Nuevos</h3>
+              <p id="c-kpi-new">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Con Compras en Periodo</h3>
+              <p id="c-kpi-active">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Ticket Prom. por Cliente</h3>
+              <p id="c-kpi-ticket">-</p>
+            </article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel wide">
+              <h3>Clientes Nuevos por Mes</h3>
+              <canvas id="c-monthly-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Top 10 Clientes por Ventas</h3>
+              <canvas id="c-top-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Ventas por Provincia</h3>
+              <canvas id="c-province-chart"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <!-- TAB: PRODUCTOS -->
+        <section id="tab-productos" class="tab-pane">
+          <div class="kpi-grid kpi-grid--3">
+            <article class="kpi-card">
+              <h3>Productos Vendidos</h3>
+              <p id="p-kpi-unique">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Unidades Despachadas</h3>
+              <p id="p-kpi-units">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Categorias Activas</h3>
+              <p id="p-kpi-categories">-</p>
+            </article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel wide">
+              <h3>Top 10 por Monto</h3>
+              <canvas id="p-amount-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Top 10 por Cantidad</h3>
+              <canvas id="p-qty-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Ventas por Categoria</h3>
+              <canvas id="p-category-chart"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <!-- TAB: CONTABILIDAD -->
+        <section id="tab-contabilidad" class="tab-pane">
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <h3>Total Facturado</h3>
+              <p id="acc-kpi-invoiced">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Total Cobrado</h3>
+              <p id="acc-kpi-collected">-</p>
+            </article>
+            <article class="kpi-card kpi-card--warn">
+              <h3>Deuda Pendiente</h3>
+              <p id="acc-kpi-pending">-</p>
+            </article>
+            <article class="kpi-card kpi-card--danger">
+              <h3>Facturas Vencidas</h3>
+              <p id="acc-kpi-overdue">-</p>
+            </article>
+          </div>
+          <div class="kpi-grid kpi-grid--1 kpi-payable">
+            <article class="kpi-card kpi-card--neutral">
+              <h3>Cuentas a Pagar (proveedores)</h3>
+              <p id="acc-kpi-payable">-</p>
+            </article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel wide">
+              <h3>Facturaci&#xF3;n vs Cobros por Mes</h3>
+              <canvas id="acc-monthly-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Estado de Facturas</h3>
+              <canvas id="acc-status-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Top 10 Deudores</h3>
+              <canvas id="acc-debtors-chart"></canvas>
+            </article>
+            <article class="panel wide">
+              <h3>Gastos por Mes (Proveedores)</h3>
+              <canvas id="acc-expenses-chart"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <!-- TAB: COMPRAS -->
+        <section id="tab-compras" class="tab-pane">
+          <div class="kpi-grid kpi-grid--3">
+            <article class="kpi-card">
+              <h3>Pedidos de Compra</h3>
+              <p id="comp-kpi-orders">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Monto Total Comprado</h3>
+              <p id="comp-kpi-total">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Promedio por Orden</h3>
+              <p id="comp-kpi-avg">-</p>
+            </article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel wide">
+              <h3>Compras por Mes</h3>
+              <canvas id="comp-monthly-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Top 10 Proveedores</h3>
+              <canvas id="comp-suppliers-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Compras por Categor&#xED;a</h3>
+              <canvas id="comp-category-chart"></canvas>
+            </article>
+            <article class="panel wide">
+              <h3>Estado de Pedidos</h3>
+              <canvas id="comp-status-chart"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <!-- TAB: CRM -->
+        <section id="tab-crm" class="tab-pane">
+          <p class="tab-note">Pipeline actual &mdash; los KPIs muestran el estado presente; las nuevas oportunidades usan el rango de fecha seleccionado.</p>
+          <div class="kpi-grid kpi-grid--3">
+            <article class="kpi-card">
+              <h3>Oportunidades Activas</h3>
+              <p id="crm-kpi-active">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Ingreso Esperado Pipeline</h3>
+              <p id="crm-kpi-revenue">-</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Ganadas</h3>
+              <p id="crm-kpi-won">-</p>
+            </article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel wide">
+              <h3>Nuevas Oportunidades por Mes</h3>
+              <canvas id="crm-monthly-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Pipeline por Etapa</h3>
+              <canvas id="crm-stage-chart"></canvas>
+            </article>
+            <article class="panel">
+              <h3>Distribuci&#xF3;n por Probabilidad</h3>
+              <canvas id="crm-prob-chart"></canvas>
+            </article>
+            <article class="panel wide">
+              <h3>Ingreso Esperado por Vendedor</h3>
+              <canvas id="crm-user-chart"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <p id="status" class="status"></p>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
