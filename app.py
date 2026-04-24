@@ -3,11 +3,13 @@ from __future__ import annotations
 import datetime as dt
 import os
 import re
+import secrets
+from functools import wraps
 from typing import Any
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 
 load_dotenv()
@@ -1006,9 +1008,77 @@ def get_crm_data(client: OdooClient, date_from: dt.date, date_to: dt.date) -> di
 
 
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY") or os.getenv("SECRET_KEY") or "dev-secret-change-me"
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = os.getenv("COOKIE_SECURE", "false").lower() == "true"
+
+
+def _credentials() -> tuple[str, str]:
+    username = env("DASHBOARD_USERNAME", "admin")
+    password = env("DASHBOARD_PASSWORD", "admin123")
+    return username, password
+
+
+def _is_authenticated() -> bool:
+    return bool(session.get("authenticated"))
+
+
+def login_required(view_func):
+    @wraps(view_func)
+    def wrapped(*args: Any, **kwargs: Any):
+        if _is_authenticated():
+            return view_func(*args, **kwargs)
+        return redirect(url_for("login", next=request.path))
+
+    return wrapped
+
+
+def api_login_required(view_func):
+    @wraps(view_func)
+    def wrapped(*args: Any, **kwargs: Any):
+        if _is_authenticated():
+            return view_func(*args, **kwargs)
+        return jsonify({"error": "Unauthorized"}), 401
+
+    return wrapped
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login() -> Any:
+    if _is_authenticated():
+        return redirect(url_for("index"))
+
+    error: str | None = None
+    if request.method == "POST":
+        username = str(request.form.get("username", "")).strip()
+        password = str(request.form.get("password", ""))
+        expected_user, expected_password = _credentials()
+
+        is_valid = secrets.compare_digest(username, expected_user) and secrets.compare_digest(
+            password, expected_password
+        )
+        if is_valid:
+            session.clear()
+            session["authenticated"] = True
+            session["username"] = username
+            next_url = str(request.args.get("next") or "")
+            if not next_url.startswith("/"):
+                next_url = url_for("index")
+            return redirect(next_url)
+        error = "Usuario o clave incorrectos"
+
+    return render_template("login.html", error=error)
+
+
+@app.post("/logout")
+def logout() -> Any:
+    session.clear()
+    return redirect(url_for("login"))
 
 
 @app.get("/")
+@login_required
 def index() -> str:
     return render_template("index.html")
 
@@ -1019,6 +1089,7 @@ def health() -> Any:
 
 
 @app.get("/api/dashboard")
+@api_login_required
 def dashboard_data() -> Any:
     now = dt.date.today()
     start_default = dt.date(now.year, 1, 1)
@@ -1046,6 +1117,7 @@ def _date_range_from_request() -> tuple[dt.date, dt.date]:
 
 
 @app.get("/api/ventas")
+@api_login_required
 def ventas_data() -> Any:
     try:
         date_from, date_to = _date_range_from_request()
@@ -1056,6 +1128,7 @@ def ventas_data() -> Any:
 
 
 @app.get("/api/clientes")
+@api_login_required
 def clientes_data() -> Any:
     try:
         date_from, date_to = _date_range_from_request()
@@ -1066,6 +1139,7 @@ def clientes_data() -> Any:
 
 
 @app.get("/api/productos")
+@api_login_required
 def productos_data() -> Any:
     try:
         date_from, date_to = _date_range_from_request()
@@ -1076,6 +1150,7 @@ def productos_data() -> Any:
 
 
 @app.get("/api/contabilidad")
+@api_login_required
 def contabilidad_data() -> Any:
     try:
         date_from, date_to = _date_range_from_request()
@@ -1086,6 +1161,7 @@ def contabilidad_data() -> Any:
 
 
 @app.get("/api/compras")
+@api_login_required
 def compras_data() -> Any:
     try:
         date_from, date_to = _date_range_from_request()
@@ -1096,6 +1172,7 @@ def compras_data() -> Any:
 
 
 @app.get("/api/crm")
+@api_login_required
 def crm_data() -> Any:
     try:
         date_from, date_to = _date_range_from_request()

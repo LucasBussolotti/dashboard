@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Dashboard Odoo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b1020;
+        --bg-2: #101a35;
+        --surface: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #0ea5e9;
+        --accent-2: #22d3ee;
+        --danger: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", sans-serif;
+        background:
+          radial-gradient(900px 500px at 10% 90%, rgba(14, 165, 233, 0.22), transparent 60%),
+          radial-gradient(900px 500px at 90% 10%, rgba(34, 211, 238, 0.2), transparent 60%),
+          linear-gradient(160deg, var(--bg), var(--bg-2));
+        display: grid;
+        place-items: center;
+        padding: 18px;
+      }
+
+      .card {
+        width: min(100%, 420px);
+        background: var(--surface);
+        border-radius: 18px;
+        box-shadow: 0 25px 50px rgba(2, 6, 23, 0.45);
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        color: var(--ink);
+        font-size: 1.6rem;
+      }
+
+      p {
+        margin: 0 0 18px;
+        color: var(--muted);
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--ink);
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      input {
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 11px 14px;
+        font: inherit;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      }
+
+      .error {
+        margin: 0 0 12px;
+        color: var(--danger);
+        font-size: 0.92rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Acceso al dashboard</h1>
+      <p>Ingresa tus credenciales para continuar.</p>
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+      <form method="post">
+        <label>
+          Usuario
+          <input type="text" name="username" required autocomplete="username" />
+        </label>
+        <label>
+          Clave
+          <input type="password" name="password" required autocomplete="current-password" />
+        </label>
+        <button type="submit">Entrar</button>
+      </form>
+    </main>
+  </body>
+</html>

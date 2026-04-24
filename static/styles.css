@@ -118,10 +118,25 @@ body {
 .topbar {
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: flex-start;
   gap: 16px;
   margin-bottom: 20px;
   animation: rise 0.4s ease;
+}
+
+.logout-form {
+  margin-left: auto;
+}
+
+.logout-btn {
+  background: #111827;
+  color: #ffffff;
+  border: 1px solid #1f2937;
+  box-shadow: none;
+}
+
+.logout-btn:hover {
+  filter: brightness(1.1);
 }
 
 h1 {
@@ -409,6 +424,10 @@ button:hover {
 
   .topbar {
     flex-direction: column;
+  }
+
+  .logout-form {
+    margin-left: 0;
   }
 
   .filters {
